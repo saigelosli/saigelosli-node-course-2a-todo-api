@@ -9,7 +9,7 @@ const app = express();
 
 app.use( bodyParser.json() );
 
-app.post( "/todos", ( request, response ) => {
+app.post( "/todos", ( request, response   ) => {
   var todo = new Todo({
     text: request.body.text
   });
@@ -24,3 +24,5 @@ app.post( "/todos", ( request, response ) => {
 app.listen( 3000, () => {
   console.log( "Started on port 3000" );
 } );
+
+module.exports = { app };
