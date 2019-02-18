@@ -1,6 +1,7 @@
 const express = require( "express" );
 const bodyParser = require( "body-parser" );
 const { ObjectID } = require( "mongodb" );
+const _ = require( "lodash" );
 
 const { mongoose } = require( "./db/mongoose.js" );
 const { Todo } = require( "./models/todo.js" );
@@ -80,6 +81,33 @@ app.delete( "/todos/:id", ( request, response ) => {
 
   } ).catch( ( error ) => {
     // error - return 400 with empty body
+    response.status( 400 ).send();
+  } );
+} );
+
+app.patch( "/todos/:id", ( request, response ) => {
+  let id = request.params.id;
+
+  // This restricts the things that can be updated to only "text" and "completed"
+  let body = _.pick( request.body, ['text','completed'] );
+
+  if ( !ObjectID.isValid( id ) ) {
+    return response.status( 404 ).send();
+  }
+
+  if ( _.isBoolean( body.completed ) && body.completed ) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate( id, { $set: body }, { new: true } ).then( ( todo ) => {
+    if ( !todo ) {
+      return response.status( 404 ).send();
+    }
+    response.send( { todo } );
+  } ).catch( ( error ) => {
     response.status( 400 ).send();
   } );
 } );
