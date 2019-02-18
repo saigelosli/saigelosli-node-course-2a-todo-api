@@ -58,6 +58,32 @@ app.get( "/todos/:id", ( request, response ) => {
   } );
 } );
 
+app.delete( "/todos/:id", ( request, response ) => {
+  let id = request.params.id;
+
+  // Validate the id, else 404
+  if ( !ObjectID.isValid( id ) ) {
+    return response.status( 404 ).send();
+  }
+
+  // Remove todo by id
+  Todo.findByIdAndRemove( id ).then( ( todo ) => {
+
+    // success
+    if ( !todo ) {
+      // If no doc, sent 404 with empty body
+      return response.status( 404 ).send();
+    }
+
+    // If doc, send todo with body
+    response.send( { todo } );
+
+  } ).catch( ( error ) => {
+    // error - return 400 with empty body
+    response.status( 400 ).send();
+  } );
+} );
+
 app.listen( port, () => {
   console.log( `Started on port ${port}` );
 } );
