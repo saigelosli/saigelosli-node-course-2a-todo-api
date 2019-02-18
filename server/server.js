@@ -112,6 +112,19 @@ app.patch( "/todos/:id", ( request, response ) => {
   } );
 } );
 
+app.post( "/users", ( request, response ) => {
+  let user = new User( _.pick( request.body, [ 'email', 'password' ] ) );
+
+  user.save().then( () => {
+//    response.send( user );
+    return user.generateAuthToken();
+  } ).then( ( token ) => {
+    response.header( "x-auth", token ).send( user );
+  } ).catch( ( error ) => {
+    response.status( 400 ).send( error );
+  } );
+} );
+
 app.listen( process.env.PORT, () => {
   console.log( `Started on port ${process.env.PORT}` );
 } );
