@@ -8,6 +8,7 @@ const _ = require( "lodash" );
 const { mongoose } = require( "./db/mongoose.js" );
 const { Todo } = require( "./models/todo.js" );
 const { User } = require( "./models/user.js" );
+const { authenticate } = require( "./middleware/authenticate.js" );
 
 const app = express();
 
@@ -123,6 +124,11 @@ app.post( "/users", ( request, response ) => {
   } ).catch( ( error ) => {
     response.status( 400 ).send( error );
   } );
+} );
+
+app.get( "/users/me", authenticate, ( request, response ) => {
+
+  response.send( request.user );
 } );
 
 app.listen( process.env.PORT, () => {
