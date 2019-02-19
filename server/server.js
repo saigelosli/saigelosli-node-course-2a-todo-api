@@ -4,6 +4,7 @@ const express = require( "express" );
 const bodyParser = require( "body-parser" );
 const { ObjectID } = require( "mongodb" );
 const _ = require( "lodash" );
+const bcrypt = require( "bcryptjs" );
 
 const { mongoose } = require( "./db/mongoose.js" );
 const { Todo } = require( "./models/todo.js" );
@@ -114,6 +115,7 @@ app.patch( "/todos/:id", ( request, response ) => {
 } );
 
 app.post( "/users", ( request, response ) => {
+
   let user = new User( _.pick( request.body, [ 'email', 'password' ] ) );
 
   user.save().then( () => {
@@ -130,6 +132,24 @@ app.get( "/users/me", authenticate, ( request, response ) => {
 
   response.send( request.user );
 } );
+
+// POST /users/login {passing in email and password
+// setup route, pick off email and password from request body
+// respond with body data
+app.post( "/users/login", ( request, response ) => {
+
+  let body = new User( _.pick( request.body, [ 'email', 'password' ] ) );
+
+  User.findByCredentials( body.email, body.password ).then( ( user ) => {
+//    response.send( user );
+    return user.generateAuthToken().then( ( token ) => {
+      response.header( "x-auth", token ).send( user );
+    } );
+  } ).catch( ( error ) => {
+    response.status( 400 ).send();
+  } );
+} );
+
 
 app.listen( process.env.PORT, () => {
   console.log( `Started on port ${process.env.PORT}` );
