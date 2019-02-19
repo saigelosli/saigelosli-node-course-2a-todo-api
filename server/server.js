@@ -147,6 +147,13 @@ app.post( "/users/login", ( request, response ) => {
   } );
 } );
 
+app.delete( "/users/me/token", authenticate, ( request, response ) => {
+  request.user.removeToken( request.token ).then( () => {
+    response.status( 200 ).send();
+  }, () => {
+    response.status( 400 ).send();
+  } );
+} );
 
 app.listen( process.env.PORT, () => {
   console.log( `Started on port ${process.env.PORT}` );
