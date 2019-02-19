@@ -133,9 +133,6 @@ app.get( "/users/me", authenticate, ( request, response ) => {
   response.send( request.user );
 } );
 
-// POST /users/login {passing in email and password
-// setup route, pick off email and password from request body
-// respond with body data
 app.post( "/users/login", ( request, response ) => {
 
   let body = new User( _.pick( request.body, [ 'email', 'password' ] ) );
